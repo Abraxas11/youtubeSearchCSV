@@ -1,0 +1,30 @@
+<%- include ('header') %>
+
+<h1><%- title %></h1>
+<p><%- message %></p>
+<p><%-  %></p>
+
+<table class="table table-striped table-hover table-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Product SKU</th>
+        <th scope="col">Category</th>
+        <th scope="col">Product Name</th>
+        <th scope="col">Search Term</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% data.forEach(function(row){ %>
+    <tr>
+        <th scope="row"><%- row.virtuemart_product_id %></th>
+        <td><%- row.product_sku %></td>
+        <td><%- row.categories_names %></td>
+        <td>@<%- row.product_name %></td>
+        <td><%- row.search_term %></td>
+    </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<%- include ('footer') %>
