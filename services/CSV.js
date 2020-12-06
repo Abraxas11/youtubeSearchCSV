@@ -1,8 +1,5 @@
 const fs = require('fs');
-const util = require('util');
 const Promise = require("bluebird");
-//const readFile = util.promisify(fs.readFile);
-//const writeFile = util.promisify(fs.writeFile);
 const csv = require('fast-csv');
 const YouTubeService = require('./YouTube');
 
@@ -13,11 +10,13 @@ class CSVService {
     /**
      * Constructor
      * @param {*} csvLines - The variable that will hold the final data
-     * @param {*} csvFile Path to a CSV file that contains the data
+     * @param {*} csvFile - Path to a CSV file that contains the data
+     * @param {*} api_key - The api key to use
      */
-    constructor(csvLines, csvFile) {
+    constructor(csvLines, csvFile, api_key) {
         this.csvLines = csvLines;
         this.csvFile = csvFile;
+        this.api_key = api_key;
     }
 
     /**
@@ -49,7 +48,7 @@ class CSVService {
 
         return new Promise(function(resolve, reject) {
 
-            readCSV(self.csvLines, self.csvFile).then(function (csvLines) {
+            readCSV(self.csvLines, self.csvFile, self.api_key).then(function (csvLines) {
                 resolve(csvLines);
             }).catch(function (error) {
                 reject(error);
@@ -60,14 +59,16 @@ class CSVService {
 
 }
 
-function readCSV(csvLines, csvFile){
+function readCSV(csvLines, csvFile, api_key){
 
     return new Promise(function(resolve, reject) {
-
+        //app.locals.youTubedata = [];
         try {
-            csv.parseFile(csvFile, { maxRows: 3, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
+            csv.parseFile(csvFile, { maxRows: 2, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
                 .on('error', error => reject(error))
-                .on('data', row => logLine(csvLines, row))
+                .on('data', row => {
+                    logLine(csvLines, row, api_key)
+                })
                 //.on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
                 .on('end', rowCount => resolve(csvLines));
 
@@ -78,15 +79,25 @@ function readCSV(csvLines, csvFile){
 
 }
 
-async function logLine(csvLines, row){
-    csvLines.push(row);
+async function logLine(csvLines, row, api_key){
 
-    const youtubeService = new YouTubeService(row.search_term);
-    let result = await youtubeService.search();
+    try {
 
-    console.log(row.search_term);
-    //console.log(result);
-    //console.log(`LINE=${JSON.stringify(row)}`)
+        csvLines.push(row);
+
+        const youtubeService = new YouTubeService(row.search_term, api_key);
+        let result = await youtubeService.search();
+
+        console.log(result);
+        console.log(row.search_term);
+
+        return result;
+
+        //console.log(`LINE=${JSON.stringify(row)}`)
+    }catch (e){
+        console.log(e);
+    }
+
 }
 
 module.exports = CSVService;

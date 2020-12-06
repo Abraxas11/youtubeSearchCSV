@@ -10,10 +10,13 @@ router.get('/', async function(req, res, next) {
 
     csvLines = [];
     let csvFile = './retrogamingclub.csv';
+    let api_key = process.env.KEY2;
 
-    const csvService = new CSVService(csvLines, csvFile);
+    const csvService = new CSVService(csvLines, csvFile, api_key);
 
     let data = await csvService.getData();
+
+    //console.log(JSON.stringify(data,null, 4));
 
     res.render('uploader', {
         title: "Upload your CSV",

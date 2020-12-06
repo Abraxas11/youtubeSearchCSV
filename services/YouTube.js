@@ -10,9 +10,11 @@ class YouTubeService {
     /**
      * Constructor
      * @param {*} search_term - The search term we wish to search on YouTube
+     * @param {*} api_key - The api key to be used for searching
      */
-    constructor(search_term) {
+    constructor(search_term, api_key) {
         this.search_term = search_term;
+        this.api_key = api_key;
     }
 
     /**
@@ -24,7 +26,7 @@ class YouTubeService {
 
         return new Promise(function(resolve, reject) {
 
-            searchYouTube(self.search_term).then(function (search_data) {
+            searchYouTube(self.search_term, self.api_key).then(function (search_data) {
                 resolve(search_data);
             }).catch(function (error) {
                 reject(error);
@@ -35,17 +37,39 @@ class YouTubeService {
 
 }
 
-function searchYouTube(search_term){
+function searchYouTube(search_term, api_key){
 
     return new Promise(function(resolve, reject) {
         try {
 
-            let youTubeSearchUrl = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" +  search_term + "&type=video&videoEmbeddable=true&key=AIzaSyB187nomXbo_CL3pd8FOLBQN_vUaoSKTmc";
+            let youTubeSearchUrl = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" +  search_term + "&type=video&videoEmbeddable=true&key=" + api_key;
 
             request(youTubeSearchUrl, function (error, response, body) {
-                if (!error && response.statusCode === 200) {
-                    console.log(body);
-                    resolve(searchResponseData);
+                if (!body.error && response.statusCode === 200) {
+
+                    body = JSON.parse(body);
+
+                    let responseData = {
+                        id: body.items[0].id.videoId,
+                        publishedAt : body.items[0].snippet.publishedAt,
+                        title : body.items[0].snippet.title,
+                        description: body.items[0].snippet.description,
+                        thumbnail: body.items[0].snippet.thumbnails.medium.url
+                    }
+
+                    resolve(responseData);
+
+                }else{
+
+                    body = JSON.parse(body);
+
+                    let errorResponseData = {
+                        error: body.error && body.error.errors && body.error.errors[0].reason,
+                        code: body.error.code,
+                        message: body.error.message,
+                        status: body.error.status
+                    }
+                    reject(errorResponseData);
                 }
             })
 
