@@ -62,7 +62,6 @@ class CSVService {
 function readCSV(csvLines, csvFile, api_key){
 
     return new Promise(function(resolve, reject) {
-        //app.locals.youTubedata = [];
         try {
             csv.parseFile(csvFile, { maxRows: 2, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
                 .on('error', error => reject(error))
@@ -85,13 +84,13 @@ async function logLine(csvLines, row, api_key){
 
         csvLines.push(row);
 
-        const youtubeService = new YouTubeService(row.search_term, api_key);
-        let result = await youtubeService.search();
+        //const youtubeService = new YouTubeService(row.search_term, api_key);
+        //let result = await youtubeService.search();
 
-        console.log(result);
-        console.log(row.search_term);
+        //console.log(result);
+        //console.log(row.search_term);
 
-        return result;
+        //return result;
 
         //console.log(`LINE=${JSON.stringify(row)}`)
     }catch (e){

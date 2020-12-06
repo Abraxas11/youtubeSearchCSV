@@ -3,27 +3,75 @@ var router = express.Router();
 const Promise = require("bluebird");
 const fs = require('fs');
 const CSVService = require('../services/CSV');
+const YouTubeService = require('../services/YouTube');
+const _ = require("lodash");
 
 var csvLines = [];
 
-router.get('/', async function(req, res, next) {
+module.exports = (app) => {
 
-    csvLines = [];
-    let csvFile = './retrogamingclub.csv';
-    let api_key = process.env.KEY2;
+    router.get('/', async function(req, res, next) {
 
-    const csvService = new CSVService(csvLines, csvFile, api_key);
+        csvLines = [];
+        let csvFile = './retrogamingclub.csv';
+        let api_key = process.env.KEY2;
 
-    let data = await csvService.getData();
+        const csvService = new CSVService(csvLines, csvFile, api_key);
 
-    //console.log(JSON.stringify(data,null, 4));
+        let data = await csvService.getData();
 
-    res.render('uploader', {
-        title: "Upload your CSV",
-        message: "Here is where you upload your CSV. " + "\n" + "Up to 100 searches can be made per API key.",
-        data : data
+        app.locals.searchData = data;
+
+        //console.log(JSON.stringify(app.locals,null, 4));
+
+        res.render('uploader', {
+            title: "Upload your CSV",
+            message: "Here is where you upload your CSV. " + "\n" + "Up to 100 searches can be made per API key.",
+            data : data
+        });
+
     });
 
-});
+    router.get('/youtube', async function(req, res, next) {
 
-module.exports = router;
+        let api_key = process.env.KEY2;
+
+        //const csvService = new CSVService(csvLines, csvFile, api_key);
+
+        //let data = await csvService.getData();
+
+        //console.log(JSON.stringify(data,null, 4));
+
+        if(app.locals.searchData && app.locals.searchData.length > 0){
+
+            Promise.map(app.locals.searchData, function(row){
+                //console.log(row.search_term)
+                const youTubeService = new YouTubeService(row.search_term, api_key);
+                return youTubeService.search();
+
+            }).then(function(results){
+
+                console.log(results)
+
+                res.render('youtube', {
+                    title: "Here are your embed codes",
+                    message: "",
+                    data : results || []
+                });
+
+            }).catch(function(error){
+                console.log(error);
+            })
+
+        }else{
+            res.render('youtube', {
+                title: "Here are your embed codes",
+                message: "",
+                data : app.locals.searchData || []
+            });
+        }
+
+    });
+
+    return router;
+}
