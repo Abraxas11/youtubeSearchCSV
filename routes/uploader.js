@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 const Promise = require("bluebird");
-const fs = require('fs');
 const CSVService = require('../services/CSV');
 const YouTubeService = require('../services/YouTube');
 const _ = require("lodash");
+const multer = require("multer");
 
 var csvLines = [];
 
