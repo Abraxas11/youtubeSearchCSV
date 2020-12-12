@@ -14,24 +14,49 @@ module.exports = (app) => {
     router.get('/', async function(req, res, next) {
 
         csvLines = [];
-        let csvFile = './retrogamingclub.csv';
-        let api_key = process.env.KEY2;
+        //let csvFile = './retrogamingclub.csv';
+        //let api_key = process.env.KEY2;
 
-        const csvService = new CSVService(csvLines, csvFile, api_key);
+        //const csvService = new CSVService(csvLines, csvFile, api_key);
 
-        let data = await csvService.getData();
+        //let data = await csvService.getData();
 
-        app.locals.searchData = data;
-
-        //console.log(JSON.stringify(app.locals,null, 4));
+        //app.locals.searchData = data;
 
         res.render('uploader', {
             title: "Upload your CSV",
             message: "Here is where you upload your CSV. " + "\n" + "Up to 100 searches can be made per API key.",
-            data : data
+            data : [],
+            apiKeys : app.locals.apiKeys
         });
 
     });
+
+
+    var storage = multer.memoryStorage();
+    var upload = multer({ storage: storage });
+    //var upload = multer({ dest: 'uploads/' })
+    router.post('/', upload.array('csvFile', 1), async function(req, res, next) {
+
+        console.log(req.body);
+        console.log(req.files);
+
+        csvLines = [];
+        let csvBuffer = req.files[0].buffer
+        let api_key = req.body.apikeyselect;
+
+        const csvService = new CSVService(csvLines, csvBuffer, api_key);
+
+        let data = await csvService.getBufferData();
+
+        res.render('uploader', {
+            title: "Your CSV has been uploaded",
+            message: "Following are the 100 first results",
+            data : data,
+            apiKeys : app.locals.apiKeys
+        });
+
+    })
 
     router.get('/youtube', async function(req, res, next) {
 

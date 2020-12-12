@@ -2,6 +2,7 @@ const fs = require('fs');
 const Promise = require("bluebird");
 const csv = require('fast-csv');
 const YouTubeService = require('./YouTube');
+const { Readable } = require('stream');
 
 /**
  * Logic for reading and writing CSV data
@@ -57,6 +58,26 @@ class CSVService {
         })
     }
 
+    /**
+     * Fetches feedback data from the JSON file provided to the constructor
+     */
+    async getBufferData() {
+
+        let self = this;
+
+        console.log(self);
+
+        return new Promise(function(resolve, reject) {
+
+            readCSVfromBuffer(self.csvLines, self.csvFile, self.api_key).then(function (csvLines) {
+                resolve(csvLines);
+            }).catch(function (error) {
+                reject(error);
+            })
+
+        })
+    }
+
 }
 
 function readCSV(csvLines, csvFile, api_key){
@@ -64,6 +85,26 @@ function readCSV(csvLines, csvFile, api_key){
     return new Promise(function(resolve, reject) {
         try {
             csv.parseFile(csvFile, { maxRows: 2, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
+                .on('error', error => reject(error))
+                .on('data', row => {
+                    logLine(csvLines, row, api_key)
+                })
+                //.on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
+                .on('end', rowCount => resolve(csvLines));
+
+        }catch (e) {
+            reject(e);
+        }
+    });
+
+}
+
+function readCSVfromBuffer(csvLines, csvBuffer, api_key){
+
+    return new Promise(function(resolve, reject) {
+        try {
+
+            csv.parseStream(bufferToStream(csvBuffer), { maxRows: 50, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
                 .on('error', error => reject(error))
                 .on('data', row => {
                     logLine(csvLines, row, api_key)
@@ -97,6 +138,16 @@ async function logLine(csvLines, row, api_key){
         console.log(e);
     }
 
+}
+
+function bufferToStream(binary) {
+
+    return new Readable({
+        read() {
+            this.push(binary);
+            this.push(null);
+        }
+    });
 }
 
 module.exports = CSVService;

@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const _ = require("lodash");
 require("dotenv").config();
 
 var app = express();
@@ -15,6 +16,13 @@ var uploaderRouter = require('./routes/uploader');
 app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
 app.set('view engine', 'ejs');
+
+app.locals.apiKeys = _.compact(_.map(process.env, (env, key) => {
+  //console.log(key, env);
+  if(key.startsWith("KEY")){
+    return env;
+  }
+}));
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -11,9 +11,12 @@
         <div class="col-md-3">
             <div class="alert alert-info" role="alert">
                 <label for="apikeyselect">Choose one of the available API keys</label>
-                <select class="form-control" id="apikeyselect">
-                    <option selected value="key1">API Key 1</option>
-                    <option value="key2">API Key 2</option>
+                <select class="form-control" name="apikeyselect" id="apikeyselect">
+                    <% apiKeys.forEach(function(apiKey){ %>
+                        <tr>
+                            <option value="<%- apiKey %>"><%- apiKey %></option>
+                        </tr>
+                    <% }) %>
                 </select>
             </div>
         </div>
@@ -22,10 +25,10 @@
     <div class="form-group row">
         <div class="col-sm-12">
             <label for="csvFile">Upload your CSV file</label>
-            <input type="file" class="form-control-file" id="csvFile">
+            <input type="file" class="form-control-file" name="csvFile" id="csvFile">
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Upload</button>
 </form>
 
 
