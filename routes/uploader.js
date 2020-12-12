@@ -40,21 +40,29 @@ module.exports = (app) => {
 
         console.log(req.body);
         console.log(req.files);
+        if(req.body.apikeyselect && req.files.length > 0){
+            csvLines = [];
+            let csvBuffer = req.files[0].buffer
+            let api_key = req.body.apikeyselect;
 
-        csvLines = [];
-        let csvBuffer = req.files[0].buffer
-        let api_key = req.body.apikeyselect;
+            const csvService = new CSVService(csvLines, csvBuffer, api_key);
 
-        const csvService = new CSVService(csvLines, csvBuffer, api_key);
+            let data = await csvService.getBufferData();
 
-        let data = await csvService.getBufferData();
-
-        res.render('uploader', {
-            title: "Your CSV has been uploaded",
-            message: "Following are the 100 first results",
-            data : data,
-            apiKeys : app.locals.apiKeys
-        });
+            res.render('uploader', {
+                title: "Your CSV has been uploaded",
+                message: "Following are the 100 first results",
+                data : data,
+                apiKeys : app.locals.apiKeys
+            });
+        }else{
+            res.render('uploader', {
+                title: "Your CSV has not been uploaded",
+                message: "Please try again",
+                data : [],
+                apiKeys : app.locals.apiKeys
+            });
+        }
 
     })
 
