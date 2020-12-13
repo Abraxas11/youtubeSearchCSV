@@ -17,10 +17,13 @@ app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
 app.set('view engine', 'ejs');
 
-app.locals.apiKeys = _.compact(_.map(process.env, (env, key) => {
+app.locals.apiKeys = _.compact(_.map(process.env, (value, key) => {
   //console.log(key, env);
-  if(key.startsWith("KEY")){
-    return env;
+  if(key.startsWith("API_KEY")){
+    return {
+      key: key,
+      value : value
+    };
   }
 }));
 

@@ -1,5 +1,11 @@
 <%- include ('header') %>
 
+<%if (locals.error) { %>
+    <div class="alert alert-danger" role="alert">
+        <%- error %>
+    </div>
+<% } %>
+
 <h1><%- title %></h1>
 <p><%- message %></p>
 <p><%-  %></p>
@@ -14,7 +20,7 @@
                 <select class="form-control" name="apikeyselect" id="apikeyselect">
                     <% apiKeys.forEach(function(apiKey){ %>
                         <tr>
-                            <option value="<%- apiKey %>"><%- apiKey %></option>
+                            <option value="<%- apiKey.value %>"><%- apiKey.key.replace(/_/g, " ") %></option>
                         </tr>
                     <% }) %>
                 </select>
@@ -57,7 +63,7 @@
         <th scope="row"><%- row.virtuemart_product_id %></th>
         <td><%- row.product_sku %></td>
         <td><%- row.categories_names %></td>
-        <td>@<%- row.product_name %></td>
+        <td><%- row.product_name %></td>
         <td><%- row.search_term %></td>
     </tr>
     <% }) %>

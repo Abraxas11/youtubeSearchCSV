@@ -18,6 +18,7 @@ class CSVService {
         this.csvLines = csvLines;
         this.csvFile = csvFile;
         this.api_key = api_key;
+        this.count = 0;
     }
 
     /**
@@ -69,7 +70,7 @@ class CSVService {
 
         return new Promise(function(resolve, reject) {
 
-            readCSVfromBuffer(self.csvLines, self.csvFile, self.api_key).then(function (csvLines) {
+            readCSVfromBuffer(self.csvLines, self.csvFile, self.count, self.api_key).then(function (csvLines) {
                 resolve(csvLines);
             }).catch(function (error) {
                 reject(error);
@@ -99,15 +100,18 @@ function readCSV(csvLines, csvFile, api_key){
 
 }
 
-function readCSVfromBuffer(csvLines, csvBuffer, api_key){
+function readCSVfromBuffer(csvLines, csvBuffer, count, api_key){
 
     return new Promise(function(resolve, reject) {
         try {
 
-            csv.parseStream(bufferToStream(csvBuffer), { maxRows: 50, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
+            csv.parseStream(bufferToStream(csvBuffer), { maxRows: 1000, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
                 .on('error', error => reject(error))
                 .on('data', row => {
-                    logLine(csvLines, row, api_key)
+                    if(row.product_desc === "" && count < 10){
+                        count++;
+                        logLine(csvLines, row, api_key)
+                    }
                 })
                 //.on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
                 .on('end', rowCount => resolve(csvLines));

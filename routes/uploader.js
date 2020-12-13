@@ -5,7 +5,6 @@ const CSVService = require('../services/CSV');
 const YouTubeService = require('../services/YouTube');
 const _ = require("lodash");
 const multer = require("multer");
-const uuid = require("uuid").v4;
 
 var csvLines = [];
 
@@ -35,26 +34,41 @@ module.exports = (app) => {
 
     var storage = multer.memoryStorage();
     var upload = multer({ storage: storage });
-    //var upload = multer({ dest: 'uploads/' })
+
     router.post('/', upload.array('csvFile', 1), async function(req, res, next) {
 
         console.log(req.body);
         console.log(req.files);
-        if(req.body.apikeyselect && req.files.length > 0){
-            csvLines = [];
-            let csvBuffer = req.files[0].buffer
-            let api_key = req.body.apikeyselect;
+        if(req.body.apikeyselect && req.files.length > 0) {
 
-            const csvService = new CSVService(csvLines, csvBuffer, api_key);
+            if(req.files[0].mimetype !=="text/csv"){
+                res.render('uploader', {
+                    title: "Your CSV has not been uploaded",
+                    message: "Please try again",
+                    data : [],
+                    error: "Only CSV files are supported... γαμώ τη Παναγία σας!",
+                    apiKeys : app.locals.apiKeys
+                });
+            }else{
+                csvLines = [];
+                let csvBuffer = req.files[0].buffer
+                let api_key = req.body.apikeyselect;
 
-            let data = await csvService.getBufferData();
+                const csvService = new CSVService(csvLines, csvBuffer, api_key);
 
-            res.render('uploader', {
-                title: "Your CSV has been uploaded",
-                message: "Following are the 100 first results",
-                data : data,
-                apiKeys : app.locals.apiKeys
-            });
+                let data = await csvService.getBufferData();
+
+                app.locals.searchData = data;
+                app.locals.apikeyselect = req.body.apikeyselect;
+
+                res.render('uploader', {
+                    title: "Your CSV has been uploaded",
+                    message: "Following are the 100 first results that are missing the YouTube embed code",
+                    data : data,
+                    apiKeys : app.locals.apiKeys
+                });
+            }
+
         }else{
             res.render('uploader', {
                 title: "Your CSV has not been uploaded",
@@ -74,9 +88,16 @@ module.exports = (app) => {
 
         //let data = await csvService.getData();
 
-        //console.log(JSON.stringify(data,null, 4));
+        console.log(app.locals.apikeyselect);
+        console.log(app.locals.searchData);
 
-        if(app.locals.searchData && app.locals.searchData.length > 0){
+        res.render('youtube', {
+            title: "Here are your embed codes",
+            message: "",
+            data : app.locals.searchData || []
+        });
+
+        /*if(app.locals.searchData && app.locals.searchData.length > 0){
 
             Promise.map(app.locals.searchData, function(row){
                 //console.log(row.search_term)
@@ -103,7 +124,7 @@ module.exports = (app) => {
                 message: "",
                 data : app.locals.searchData || []
             });
-        }
+        }*/
 
     });
 
