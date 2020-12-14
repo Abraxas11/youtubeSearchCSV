@@ -16,8 +16,8 @@
     <div class="form-group row">
         <div class="col-md-3">
             <div class="alert alert-info" role="alert">
-                <label for="apikeyselect">Choose one of the available API keys</label>
-                <select class="form-control" name="apikeyselect" id="apikeyselect">
+                <label for="selectedapikey">Choose one of the available API keys</label>
+                <select class="form-control" name="selectedapikey" id="selectedapikey">
                     <% apiKeys.forEach(function(apiKey){ %>
                         <tr>
                             <option value="<%- apiKey.value %>"><%- apiKey.key.replace(/_/g, " ") %></option>

@@ -39,7 +39,7 @@ module.exports = (app) => {
 
         console.log(req.body);
         console.log(req.files);
-        if(req.body.apikeyselect && req.files.length > 0) {
+        if(req.body.selectedapikey && req.files.length > 0) {
 
             if(req.files[0].mimetype !=="text/csv"){
                 res.render('uploader', {
@@ -52,14 +52,14 @@ module.exports = (app) => {
             }else{
                 csvLines = [];
                 let csvBuffer = req.files[0].buffer
-                let api_key = req.body.apikeyselect;
+                let api_key = req.body.selectedapikey;
 
                 const csvService = new CSVService(csvLines, csvBuffer, api_key);
 
                 let data = await csvService.getBufferData();
 
                 app.locals.searchData = data;
-                app.locals.apikeyselect = req.body.apikeyselect;
+                app.locals.selectedapikey = req.body.selectedapikey;
 
                 res.render('uploader', {
                     title: "Your CSV has been uploaded",
@@ -82,13 +82,11 @@ module.exports = (app) => {
 
     router.get('/youtube', async function(req, res, next) {
 
-        let api_key = process.env.KEY2;
-
         //const csvService = new CSVService(csvLines, csvFile, api_key);
 
         //let data = await csvService.getData();
 
-        console.log(app.locals.apikeyselect);
+        console.log(app.locals.selectedapikey);
         console.log(app.locals.searchData);
 
         res.render('youtube', {
