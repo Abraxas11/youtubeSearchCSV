@@ -22,26 +22,6 @@ class CSVService {
     }
 
     /**
-     * Get all feedback items
-     */
-    /*async getList() {
-        const data = await this.getData();
-        return data;
-    }*/
-
-    /**
-     * Add a new feedback item
-     * @param {*} name The name of the user
-     * @param {*} title The title of the feedback message
-     * @param {*} message The feedback message
-     */
-    /*async addEntry(name, email, title, message) {
-        const data = (await this.getData()) || [];
-        data.unshift({ name, email, title, message });
-        return writeFile(this.datafile, JSON.stringify(data));
-    }*/
-
-    /**
      * Fetches feedback data from the JSON file provided to the constructor
      */
     async getData() {
@@ -66,8 +46,6 @@ class CSVService {
 
         let self = this;
 
-        console.log(self);
-
         return new Promise(function(resolve, reject) {
 
             readCSVfromBuffer(self.csvLines, self.csvFile, self.count, self.api_key).then(function (csvLines) {
@@ -79,6 +57,48 @@ class CSVService {
         })
     }
 
+}
+
+function readCSVfromBuffer(csvLines, csvBuffer, count, api_key){
+
+    return new Promise(function(resolve, reject) {
+        try {
+
+            csv.parseStream(bufferToStream(csvBuffer), { maxRows: 10000, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
+                .on('error', error => reject(error))
+                .on('data', row => {
+                    if(row.product_desc === "" && count < 80){
+                        count++;
+                        logLine(csvLines, row, api_key)
+                    }
+                })
+                //.on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
+                .on('end', rowCount => resolve(csvLines));
+
+        }catch (e) {
+            reject(e);
+        }
+    });
+
+}
+
+async function logLine(csvLines, row, api_key){
+
+    try {
+        csvLines.push(row);
+    }catch (e){
+        console.log(e);
+    }
+
+}
+
+function bufferToStream(binary) {
+    return new Readable({
+        read() {
+            this.push(binary);
+            this.push(null);
+        }
+    });
 }
 
 function readCSV(csvLines, csvFile, api_key){
@@ -98,60 +118,6 @@ function readCSV(csvLines, csvFile, api_key){
         }
     });
 
-}
-
-function readCSVfromBuffer(csvLines, csvBuffer, count, api_key){
-
-    return new Promise(function(resolve, reject) {
-        try {
-
-            csv.parseStream(bufferToStream(csvBuffer), { maxRows: 1000, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
-                .on('error', error => reject(error))
-                .on('data', row => {
-                    if(row.product_desc === "" && count < 10){
-                        count++;
-                        logLine(csvLines, row, api_key)
-                    }
-                })
-                //.on('end', rowCount => console.log(`Parsed ${rowCount} rows`));
-                .on('end', rowCount => resolve(csvLines));
-
-        }catch (e) {
-            reject(e);
-        }
-    });
-
-}
-
-async function logLine(csvLines, row, api_key){
-
-    try {
-
-        csvLines.push(row);
-
-        //const youtubeService = new YouTubeService(row.search_term, api_key);
-        //let result = await youtubeService.search();
-
-        //console.log(result);
-        //console.log(row.search_term);
-
-        //return result;
-
-        //console.log(`LINE=${JSON.stringify(row)}`)
-    }catch (e){
-        console.log(e);
-    }
-
-}
-
-function bufferToStream(binary) {
-
-    return new Readable({
-        read() {
-            this.push(binary);
-            this.push(null);
-        }
-    });
 }
 
 module.exports = CSVService;

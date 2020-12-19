@@ -7,11 +7,6 @@
 <table class="table table-striped table-hover table-sm">
     <thead class="thead-dark">
     <tr>
-<!--        <th scope="col">Image</th>-->
-<!--        <th scope="col">Video id</th>-->
-<!--        <th scope="col">Published</th>-->
-<!--        <th scope="col">Title</th>-->
-<!--        <th scope="col">Description</th>-->
         <th scope="col">Product id</th>
         <th scope="col">Product Description</th>
     </tr>
@@ -19,15 +14,10 @@
     <tbody>
     <% data.forEach(function(row){ %>
     <tr>
-<!--        <td><a target="_blank" href="https://www.youtube.com/watch?v=<%- row.id %>"><img width=100px src="<%- row.thumbnail %>"></a></td>-->
-<!--        <th scope="row"><%- row.id %></th>-->
-<!--        <td><%- row.publishedAt %></td>-->
-<!--        <td><%- row.title %></td>-->
-<!--        <td><%- row.description %></td>-->
-        <th scope="row"><%- row.virtuemart_product_id %></th>
-        <th scope="row">
-            &lt;iframe width="1090" height="613" src="https://www.youtube.com/embed/<%- row.virtuemart_product_id %>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
-        </th>
+        <td scope="row"><%- row.csvId %></td>
+        <td scope="row">
+            &lt;iframe width="1090" height="613" src="https://www.youtube.com/embed/<%- row.id %>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+        </td>
     </tr>
     <% }) %>
     </tbody>

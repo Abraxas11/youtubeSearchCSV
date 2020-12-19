@@ -9,10 +9,12 @@ const request = require('request');
 class YouTubeService {
     /**
      * Constructor
+     * @param {*} csvId - The id from the csv line
      * @param {*} search_term - The search term we wish to search on YouTube
      * @param {*} api_key - The api key to be used for searching
      */
-    constructor(search_term, api_key) {
+    constructor(csvId, search_term, api_key) {
+        this.csvId = csvId || 0;
         this.search_term = search_term;
         this.api_key = api_key;
     }
@@ -26,7 +28,7 @@ class YouTubeService {
 
         return new Promise(function(resolve, reject) {
 
-            searchYouTube(self.search_term, self.api_key).then(function (search_data) {
+            searchYouTube(self.csvId, self.search_term, self.api_key).then(function (search_data) {
                 resolve(search_data);
             }).catch(function (error) {
                 reject(error);
@@ -37,7 +39,7 @@ class YouTubeService {
 
 }
 
-function searchYouTube(search_term, api_key){
+function searchYouTube(csvId, search_term, api_key){
 
     return new Promise(function(resolve, reject) {
         try {
@@ -51,6 +53,7 @@ function searchYouTube(search_term, api_key){
 
                     let responseData = {
                         id: body.items[0].id.videoId,
+                        csvId: csvId,
                         publishedAt : body.items[0].snippet.publishedAt,
                         title : body.items[0].snippet.title,
                         description: body.items[0].snippet.description,

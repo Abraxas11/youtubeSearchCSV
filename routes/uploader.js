@@ -13,14 +13,6 @@ module.exports = (app) => {
     router.get('/', async function(req, res, next) {
 
         csvLines = [];
-        //let csvFile = './retrogamingclub.csv';
-        //let api_key = process.env.KEY2;
-
-        //const csvService = new CSVService(csvLines, csvFile, api_key);
-
-        //let data = await csvService.getData();
-
-        //app.locals.searchData = data;
 
         res.render('uploader', {
             title: "Upload your CSV",
@@ -37,8 +29,8 @@ module.exports = (app) => {
 
     router.post('/', upload.array('csvFile', 1), async function(req, res, next) {
 
-        console.log(req.body);
-        console.log(req.files);
+        // console.log(req.body);
+        // console.log(req.files);
         if(req.body.selectedapikey && req.files.length > 0) {
 
             if(req.files[0].mimetype !=="text/csv"){
@@ -82,24 +74,50 @@ module.exports = (app) => {
 
     router.get('/youtube', async function(req, res, next) {
 
-        //const csvService = new CSVService(csvLines, csvFile, api_key);
-
-        //let data = await csvService.getData();
-
         console.log(app.locals.selectedapikey);
-        console.log(app.locals.searchData);
+        //console.log(app.locals.searchData);
 
-        res.render('youtube', {
-            title: "Here are your embed codes",
-            message: "",
-            data : app.locals.searchData || []
-        });
+        if(app.locals.searchData && app.locals.searchData.length > 0 && !_.isEmpty(app.locals.selectedapikey)){
 
-        /*if(app.locals.searchData && app.locals.searchData.length > 0){
+            let promiseArray = [];
+            _.forEach(app.locals.searchData, function(data){
+                promiseArray.push(
+                        new Promise((resolve, reject) => {
+                        const youTubeService = new YouTubeService(data.virtuemart_product_id, data.search_term, app.locals.selectedapikey);
+                        resolve(youTubeService.search());
+                    })
+                );
+            })
 
-            Promise.map(app.locals.searchData, function(row){
+            Promise.all(promiseArray)
+                .then((values) => {
+                    console.log("values:");
+                    console.log(values);
+                    return values
+                }).then(function(results){
+
+                    //console.log(results)
+
+                    res.render('youtube', {
+                        title: "Here are your embed codes",
+                        message: "",
+                        data : results || []
+                    });
+
+                }).catch(function(error){
+                    console.log("error:");
+                    console.log(error);
+                    res.render('youtube', {
+                        title: "Something went wrong! (" + error.error + ")",
+                        message: error.message + " Please use a different API key",
+                        data : [error.message]
+                    });
+                })
+
+
+            /*Promise.map(app.locals.searchData, function(row){
                 //console.log(row.search_term)
-                const youTubeService = new YouTubeService(row.search_term, api_key);
+                const youTubeService = new YouTubeService(row.virtuemart_product_id, row.search_term, app.locals.selectedapikey);
                 return youTubeService.search();
 
             }).then(function(results){
@@ -114,15 +132,26 @@ module.exports = (app) => {
 
             }).catch(function(error){
                 console.log(error);
-            })
+                res.render('youtube', {
+                    title: "Something went wrong! (" + error.error + ")",
+                    message: "Please use a different API key",
+                    data : [error.message]
+                });
+            })*/
 
         }else{
             res.render('youtube', {
-                title: "Here are your embed codes",
+                title: "Something went wrong!",
                 message: "",
                 data : app.locals.searchData || []
             });
-        }*/
+        }
+
+        /*res.render('youtube', {
+            title: "Here are your embed codes",
+            message: "",
+            data : app.locals.searchData || []
+        });*/
 
     });
 
