@@ -3,7 +3,7 @@
 1. Install GIT and node.js:
     - https://git-scm.com/download/win
     - https://nodejs.org/en/
-2. Go to the folder you would like to have the project and clone the repository:
+2. Go to the folder you would like to have the project in and clone the repository:
     - `git clone https://github.com/Abraxas11/youtubeSearchCSV.git`
 3. You should now see a folder named `youtubeSearchCSV`.
 4. Go inside this folder and run `npm install`.
