@@ -1,5 +1,11 @@
 <%- include ('header') %>
 
+<%if (locals.error) { %>
+    <div class="alert alert-danger" role="alert">
+        <%- error %>
+    </div>
+<% } %>
+
 <h1><%- title %></h1>
 <p><%- message %></p>
 <p><%-  %></p>
@@ -12,14 +18,16 @@
     </tr>
     </thead>
     <tbody>
-    <% data.forEach(function(row){ %>
-    <tr>
-        <td scope="row"><%- row.csvId %></td>
-        <td scope="row">
-            &lt;iframe width="1090" height="613" src="https://www.youtube.com/embed/<%- row.id %>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
-        </td>
-    </tr>
-    <% }) %>
+    <%if (!locals.error) { %>
+        <% data.forEach(function(row){ %>
+            <tr>
+                <td scope="row"><%- row.csvId %></td>
+                <td scope="row">
+                    &lt;iframe width="1090" height="613" src="https://www.youtube.com/embed/<%- row.id %>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+                </td>
+            </tr>
+        <% }) %>
+    <% } %>
     </tbody>
 </table>
 

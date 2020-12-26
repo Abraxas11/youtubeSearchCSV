@@ -110,9 +110,10 @@ module.exports = (app) => {
                     res.render('youtube', {
                         title: "Something went wrong! (" + error.error + ")",
                         message: error.message + " Please use a different API key",
+                        error: error.error==="quotaExceeded"?"You don't have any more search credits left, γαμώ τη Παναγία σας!! Please try another API key, thank you.":"Something went wrong! (" + error.error + ")",
                         data : [error.message]
                     });
-                })
+                });
 
 
             /*Promise.map(app.locals.searchData, function(row){
