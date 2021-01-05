@@ -33,7 +33,7 @@ module.exports = (app) => {
         // console.log(req.files);
         if(req.body.selectedapikey && req.files.length > 0) {
 
-            if(req.files[0].mimetype !=="text/csv" || req.files[0].mimetype !=="application/octet-stream"){
+            if(req.files[0].mimetype !=="text/csv" && req.files[0].mimetype !=="application/octet-stream"){
                 res.render('uploader', {
                     title: "Your CSV has not been uploaded",
                     message: "Please try again",
