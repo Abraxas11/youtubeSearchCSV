@@ -9,7 +9,6 @@ require("dotenv").config();
 var app = express();
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var uploaderRouter = require('./routes/uploader');
 
 // view engine setup
@@ -35,9 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/uploader', uploaderRouter(app));
+//app.use('/', indexRouter);
+app.use('/', uploaderRouter(app));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -67,7 +67,7 @@ function readCSVfromBuffer(csvLines, csvBuffer, count, api_key){
             csv.parseStream(bufferToStream(csvBuffer), { maxRows: 10000, ignoreEmpty: true, headers: true, discardUnmappedColumns:true, trim:true })
                 .on('error', error => reject(error))
                 .on('data', row => {
-                    if(row.product_desc === "" && count < 80){
+                    if(row.product_desc === "" && count < 100){
                         count++;
                         logLine(csvLines, row, api_key)
                     }
