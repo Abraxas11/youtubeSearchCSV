@@ -18,7 +18,8 @@ module.exports = (app) => {
             title: "Upload your CSV",
             message: "Here is where you upload your CSV. " + "\n" + "Up to 100 searches can be made per API key.",
             data : [],
-            apiKeys : app.locals.apiKeys
+            apiKeys : app.locals.apiKeys,
+            selectedApiKey : app.locals.selectedapikey || undefined
         });
 
     });
