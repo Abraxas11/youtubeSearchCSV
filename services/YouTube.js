@@ -15,7 +15,7 @@ class YouTubeService {
      */
     constructor(csvId, search_term, api_key) {
         this.csvId = csvId || 0;
-        this.search_term = search_term;
+        this.search_term = escape(search_term);
         this.api_key = api_key;
     }
 
@@ -27,7 +27,6 @@ class YouTubeService {
         let self = this;
 
         return new Promise(function(resolve, reject) {
-
             searchYouTube(self.csvId, self.search_term, self.api_key).then(function (search_data) {
                 resolve(search_data);
             }).catch(function (error) {
@@ -44,7 +43,10 @@ function searchYouTube(csvId, search_term, api_key){
     return new Promise(function(resolve, reject) {
         try {
 
-            let youTubeSearchUrl = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" +  search_term + "&type=video&videoEmbeddable=true&key=" + api_key;
+            let youTubeSearchUrl = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${search_term}&type=video&videoEmbeddable=true&key=${api_key}`;
+
+            //console.log(csvId, search_term, api_key);
+            //console.log(youTubeSearchUrl);
 
             request(youTubeSearchUrl, function (error, response, body) {
                 if (!body.error && response.statusCode === 200) {

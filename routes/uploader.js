@@ -75,7 +75,7 @@ module.exports = (app) => {
 
     router.get('/youtube', async function(req, res, next) {
 
-        console.log(app.locals.selectedapikey);
+        console.log("Selected API Key: " + app.locals.selectedapikey);
         //console.log(app.locals.searchData);
 
         if(app.locals.searchData && app.locals.searchData.length > 0 && !_.isEmpty(app.locals.selectedapikey)){
@@ -83,7 +83,7 @@ module.exports = (app) => {
             let promiseArray = [];
             _.forEach(app.locals.searchData, function(data){
                 promiseArray.push(
-                        new Promise((resolve, reject) => {
+                    new Promise((resolve, reject) => {
                         const youTubeService = new YouTubeService(data.virtuemart_product_id, data.search_term, app.locals.selectedapikey);
                         resolve(youTubeService.search());
                     })
